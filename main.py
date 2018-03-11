@@ -36,12 +36,23 @@ def get_details(tez_no):
     soup = BeautifulSoup(page.content, 'html.parser')
     tez_name = soup.find_all("tr")[1].find_all("td")[2].text.split("Yazar")[0].strip()
 
-    return {
+    # Fix white space related problems
+    tez_name = tez_name.replace("\n", " ").replace("\r", "")
+
+    result = {
         "id": web_id,
         "no": web_no,
         "url": tez_url,
         "name": tez_name
     }
+
+    name_parts = tez_name.split(" / ")
+
+    if len(name_parts) == 2 and name_parts[1][0].isupper():
+        result["name"] = name_parts[0]
+        result["translation"] = name_parts[1]
+
+    return result
 
 
 if __name__ == "__main__":
@@ -54,3 +65,6 @@ if __name__ == "__main__":
         print("NO: %s" % details["no"])
         print("URL: %s" % details["url"])
         print(u"İsim: %s" % details["name"])
+
+        if details.get("translation"):
+            print(u"Çeviri: %s" % details["translation"])
